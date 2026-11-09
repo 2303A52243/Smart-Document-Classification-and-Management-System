@@ -49,3 +49,4 @@ cd frontend
 npm run build
 ```
 Result: `✓ built in 2.56s` with 0 errors.
+

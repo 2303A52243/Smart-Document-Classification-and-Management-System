@@ -90,3 +90,4 @@ kubectl logs -l component=backend --tail=50
 ```bash
 kubectl delete -f k8s/
 ```
+

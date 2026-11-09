@@ -455,3 +455,4 @@ npm run build
   4. *Deployment Using Kubernetes* (2 Marks): Validated manifests with probes, PVCs, and services.
   5. *Project Documentation* (2 Marks): Comprehensive README and detailed `docs/` guides.
 - **Total Marks Target**: 10 / 10
+

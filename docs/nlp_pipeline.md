@@ -43,3 +43,4 @@ The system does not blindly assign high confidence to unfamiliar documents:
 - **Held-out Split**: Stratified 80/20 train/test split (112 train samples, 28 test samples).
 - **Test Metrics**: Held-out test accuracy of 96.4% on synthetic data.
 - **Academic Disclaimer**: Performance evaluated on synthetic data does not constitute evidence of real-world operational accuracy. Users can train on real-world datasets by importing custom CSV rows.
+

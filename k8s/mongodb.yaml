@@ -52,3 +52,4 @@ spec:
   selector:
     app: smart-doc
     component: mongodb
+

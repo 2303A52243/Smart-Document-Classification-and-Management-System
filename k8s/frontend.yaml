@@ -59,3 +59,4 @@ spec:
   selector:
     app: smart-doc
     component: frontend
+

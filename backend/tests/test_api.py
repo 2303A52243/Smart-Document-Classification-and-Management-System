@@ -156,3 +156,4 @@ def test_analytics_endpoints(client):
     act = client.get("/api/analytics/activity", headers=headers)
     assert act.status_code == 200
     assert isinstance(act.json(), list)
+

@@ -122,3 +122,4 @@ If the backend logs `❌ MongoDB connection failed`:
    python -m ml_training.train
    ```
 4. Restart or call the backend reload hook; the updated model and `model_metrics.json` are loaded automatically.
+

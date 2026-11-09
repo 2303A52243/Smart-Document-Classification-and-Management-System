@@ -63,3 +63,4 @@ graph TB
 - **MongoDB**: Stores structured document records, user accounts, and activity telemetry.
 - **Local Storage Vault**: Stores original files under randomized UUID names.
 - **Model Storage**: Stores serialized joblib pipelines and evaluation metric JSON reports.
+

@@ -70,3 +70,4 @@ def test_nlp_classifier_empty_fallback():
     assert res.predicted_category == "other"
     assert res.needs_review is True
     assert res.confidence_score == 0.0
+

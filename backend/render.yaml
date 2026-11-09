@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: smart-doc-backend
+    runtime: python
+    region: singapore          # closest to India
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MONGODB_URL
+        sync: false            # you will paste the Atlas URI in the Render dashboard
+      - key: MONGODB_DB_NAME
+        value: smart_doc_db
+      - key: JWT_SECRET_KEY
+        generateValue: true    # Render generates a secure random value
+      - key: FRONTEND_URL
+        sync: false            # you will paste your Vercel URL after deploying
+      - key: CORS_ORIGINS
+        sync: false            # paste your Vercel URL here too (can be same as FRONTEND_URL)
+      - key: DEBUG
+        value: "false"
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      - key: MAX_FILE_SIZE_MB
+        value: "15"
+      - key: CONFIDENCE_THRESHOLD
+        value: "0.40"
+    disk:
+      name: uploads
+      mountPath: /app/uploads
+      sizeGB: 1

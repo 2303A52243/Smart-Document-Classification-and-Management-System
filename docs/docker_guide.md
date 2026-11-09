@@ -56,3 +56,4 @@ To also remove volumes (Warning: resets database):
 ```bash
 docker-compose down -v
 ```
+

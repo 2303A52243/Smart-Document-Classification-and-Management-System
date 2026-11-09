@@ -7,8 +7,13 @@ from pathlib import Path
 
 # Base directories
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-UPLOADS_DIR = BASE_DIR / "uploads"
-MODELS_DIR = BASE_DIR / "models"
+
+# Allow overriding via env variables (useful for Render persistent disk mount)
+_uploads_env = os.getenv("UPLOADS_DIR", "")
+_models_env = os.getenv("MODELS_DIR", "")
+
+UPLOADS_DIR = Path(_uploads_env) if _uploads_env else BASE_DIR / "uploads"
+MODELS_DIR = Path(_models_env) if _models_env else BASE_DIR / "models"
 
 # Ensure directories exist
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
@@ -36,14 +41,25 @@ class Settings:
     MAX_FILE_SIZE_BYTES: int = MAX_FILE_SIZE_MB * 1024 * 1024
     ALLOWED_EXTENSIONS: set = {"pdf", "docx", "txt"}
 
-    # CORS
+    # CORS — includes Vercel and local dev origins
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
-    CORS_ORIGINS: list = [
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
-    ]
+
+    @property
+    def CORS_ORIGINS(self) -> list:
+        origins = [
+            "http://localhost:5173",
+            "http://localhost:3000",
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:3000",
+        ]
+        # Add any extra origins from env (comma-separated)
+        extra = os.getenv("CORS_ORIGINS", "")
+        if extra:
+            origins += [o.strip() for o in extra.split(",") if o.strip()]
+        # Always include FRONTEND_URL if set
+        if self.FRONTEND_URL not in origins:
+            origins.append(self.FRONTEND_URL)
+        return origins
 
     # NLP Model
     MODEL_PATH: Path = MODELS_DIR / "document_classifier.joblib"

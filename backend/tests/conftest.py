@@ -24,3 +24,4 @@ def auth_headers():
     test_user_id = str(ObjectId())
     token = create_access_token({"sub": test_user_id})
     return {"Authorization": f"Bearer {token}"}
+
