@@ -29,3 +29,4 @@ services:
       name: uploads
       mountPath: /app/uploads
       sizeGB: 1
+
