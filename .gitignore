@@ -45,6 +45,10 @@ pnpm-debug.log*
 .env.*
 !.env.example
 
+# Binaries and local tools
+cloudflared.exe
+*.exe
+
 # Document Uploads & Databases (NEVER COMMIT USER DOCUMENTS)
 backend/uploads/*
 !backend/uploads/.gitkeep
