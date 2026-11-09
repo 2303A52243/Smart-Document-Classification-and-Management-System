@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:8.0
+    container_name: smart-doc-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: smart_doc_db
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - smart-doc-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smart-doc-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_DB_NAME=smart_doc_db
+      - JWT_SECRET_KEY=production-secure-smart-doc-jwt-secret-key-32chars
+      - ACCESS_TOKEN_EXPIRE_MINUTES=1440
+      - CONFIDENCE_THRESHOLD=0.40
+      - MAX_FILE_SIZE_MB=15
+      - FRONTEND_URL=http://localhost:3000
+    volumes:
+      - document_uploads:/app/uploads
+      - model_artifacts:/app/models
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - smart-doc-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smart-doc-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - smart-doc-network
+
+volumes:
+  mongodb_data:
+    driver: local
+  document_uploads:
+    driver: local
+  model_artifacts:
+    driver: local
+
+networks:
+  smart-doc-network:
+    driver: bridge
