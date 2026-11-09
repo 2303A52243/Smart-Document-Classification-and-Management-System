@@ -32,9 +32,13 @@ export default function Register() {
       navigate('/dashboard');
     } catch (err) {
       console.error(err);
-      setError(
-        err.response?.data?.detail || 'Registration failed. An account with this email may already exist.'
-      );
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else if (!err.response || err.message === 'Network Error') {
+        setError('Cannot connect to backend server. Make sure your backend server/tunnel is running.');
+      } else {
+        setError('Registration failed. Please check your details and try again.');
+      }
     } finally {
       setLoading(false);
     }

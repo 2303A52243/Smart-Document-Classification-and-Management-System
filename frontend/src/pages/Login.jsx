@@ -21,9 +21,13 @@ export default function Login() {
       navigate('/dashboard');
     } catch (err) {
       console.error(err);
-      setError(
-        err.response?.data?.detail || 'Failed to sign in. Please check your credentials.'
-      );
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else if (!err.response || err.message === 'Network Error') {
+        setError('Cannot connect to backend server. Make sure your backend server/tunnel is running.');
+      } else {
+        setError('Failed to sign in. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }

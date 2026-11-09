@@ -14,3 +14,4 @@ echo Look for the https://....trycloudflare.com link below!
 echo.
 "%~dp0cloudflared.exe" tunnel --url http://localhost:8000
 pause
+

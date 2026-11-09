@@ -48,6 +48,8 @@ pnpm-debug.log*
 # Binaries and local tools
 cloudflared.exe
 *.exe
+.vercel/
+.vercel-backup/
 
 # Document Uploads & Databases (NEVER COMMIT USER DOCUMENTS)
 backend/uploads/*
