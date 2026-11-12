@@ -1,8 +1,5 @@
 # Smart Document Classification and Management System Using NLP
 
-> **B.Tech IV Year DevOps & Full Stack Course Project — Academic Year 2026–2027**  
-> Total Evaluation: **10 Marks** (Code Quality: 2 | Git & Repo: 2 | Docker: 2 | Kubernetes: 2 | Documentation: 2)
-
 ---
 
 ## 1. Project Title
