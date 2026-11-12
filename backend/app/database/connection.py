@@ -21,10 +21,19 @@ db_instance = Database()
 async def connect_db():
     """Connect to MongoDB and create indexes."""
     try:
+        client_kwargs = {
+            "serverSelectionTimeoutMS": 5000,
+            "connectTimeoutMS": 5000,
+        }
+        try:
+            import certifi
+            client_kwargs["tlsCAFile"] = certifi.where()
+        except ImportError:
+            pass
+
         db_instance.client = AsyncIOMotorClient(
             settings.MONGODB_URL,
-            serverSelectionTimeoutMS=5000,
-            connectTimeoutMS=5000,
+            **client_kwargs,
         )
         db_instance.db = db_instance.client[settings.MONGODB_DB_NAME]
 

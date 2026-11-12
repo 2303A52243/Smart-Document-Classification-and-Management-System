@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     curl \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Install python dependencies globally
