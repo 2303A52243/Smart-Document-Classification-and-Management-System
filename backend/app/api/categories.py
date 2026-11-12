@@ -62,10 +62,18 @@ async def get_category_documents(
 
 
 @health_router.get("/health")
-def health_check():
+async def health_check():
     """API health and readiness check endpoint."""
-    from app.database.connection import db_instance
-    db_connected = db_instance.client is not None and db_instance.db is not None
+    from app.database.connection import db_instance, get_db
+    db = get_db()
+    db_connected = False
+    if db is not None and db_instance.client is not None:
+        try:
+            await db_instance.client.admin.command("ping")
+            db_connected = True
+        except Exception:
+            db_connected = False
+
     is_ready = classifier.is_loaded()
     return {
         "status": "ok" if is_ready else "error",

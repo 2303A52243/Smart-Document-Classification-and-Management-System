@@ -18,9 +18,9 @@ class Database:
 db_instance = Database()
 
 
-async def connect_db():
-    """Connect to MongoDB and create indexes."""
-    try:
+def init_db():
+    """Initialize MongoDB client if not already initialized."""
+    if db_instance.client is None:
         client_kwargs = {
             "serverSelectionTimeoutMS": 5000,
             "connectTimeoutMS": 5000,
@@ -36,6 +36,13 @@ async def connect_db():
             **client_kwargs,
         )
         db_instance.db = db_instance.client[settings.MONGODB_DB_NAME]
+    return db_instance.db
+
+
+async def connect_db():
+    """Connect to MongoDB and create indexes."""
+    try:
+        init_db()
 
         # Verify connection
         await db_instance.client.admin.command("ping")
@@ -45,13 +52,13 @@ async def connect_db():
         await create_indexes()
     except Exception as e:
         logger.error(f"❌ MongoDB connection failed: {e}")
-        logger.warning("Running without MongoDB — uploads and classifications will not persist.")
-        db_instance.client = None
-        db_instance.db = None
+        logger.warning("Running without verified MongoDB ping — client remains initialized for incoming requests.")
 
 
 async def create_indexes():
     """Create MongoDB indexes for performance."""
+    if db_instance.db is None:
+        return
     try:
         # Users collection
         await db_instance.db.users.create_indexes([
@@ -85,29 +92,35 @@ async def disconnect_db():
 
 def get_db():
     """Return the database instance."""
+    if db_instance.db is None:
+        init_db()
     return db_instance.db
 
 
 def get_users_collection():
-    if db_instance.db is None:
+    db = get_db()
+    if db is None:
         return None
-    return db_instance.db.users
+    return db.users
 
 
 def get_documents_collection():
-    if db_instance.db is None:
+    db = get_db()
+    if db is None:
         return None
-    return db_instance.db.documents
+    return db.documents
 
 
 def get_activity_logs_collection():
-    if db_instance.db is None:
+    db = get_db()
+    if db is None:
         return None
-    return db_instance.db.activity_logs
+    return db.activity_logs
 
 
 def get_categories_collection():
-    if db_instance.db is None:
+    db = get_db()
+    if db is None:
         return None
-    return db_instance.db.categories
+    return db.categories
 
