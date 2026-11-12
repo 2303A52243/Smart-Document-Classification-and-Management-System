@@ -1,1 +1,2 @@
+# Smart Document Classification System — Root Requirements Proxy
 -r backend/requirements.txt
