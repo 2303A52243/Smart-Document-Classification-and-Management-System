@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import { Menu, X, Search, Bell, Sparkles, UploadCloud } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { Menu, Search, UploadCloud } from 'lucide-react';
 
 export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();

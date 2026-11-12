@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Download, Copy, Check, ExternalLink, FileText } from 'lucide-react';
+import { X, Download, Copy, Check, FileText } from 'lucide-react';
 import CategoryBadge from './CategoryBadge';
 import { documentAPI } from '../api/client';
 

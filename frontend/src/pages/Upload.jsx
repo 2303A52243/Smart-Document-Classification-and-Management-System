@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   UploadCloud,
   FileText,
@@ -8,7 +8,6 @@ import {
   X,
   Sparkles,
   ArrowRight,
-  Eye,
   FileCheck2,
 } from 'lucide-react';
 import { documentAPI } from '../api/client';
@@ -26,7 +25,6 @@ export default function Upload() {
   const [results, setResults] = useState([]);
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
-  const navigate = useNavigate();
 
   const handleFiles = (files) => {
     setError('');

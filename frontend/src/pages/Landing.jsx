@@ -3,14 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   Sparkles,
   ArrowRight,
-  ShieldCheck,
-  Zap,
-  FolderTree,
-  Search,
   Brain,
   FileCheck2,
   Lock,
-  Layers,
   Database,
   Cpu,
 } from 'lucide-react';

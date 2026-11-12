@@ -37,6 +37,8 @@ async def connect_db():
     except Exception as e:
         logger.error(f"❌ MongoDB connection failed: {e}")
         logger.warning("Running without MongoDB — uploads and classifications will not persist.")
+        db_instance.client = None
+        db_instance.db = None
 
 
 async def create_indexes():

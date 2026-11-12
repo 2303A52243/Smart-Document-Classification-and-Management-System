@@ -4,19 +4,20 @@ services:
     runtime: python
     region: singapore          # closest to India
     plan: free
+    rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: MONGODB_URL
-        sync: false            # you will paste the Atlas URI in the Render dashboard
+        sync: false            # paste your MongoDB Atlas URI in Render dashboard
       - key: MONGODB_DB_NAME
         value: smart_doc_db
       - key: JWT_SECRET_KEY
-        generateValue: true    # Render generates a secure random value
+        generateValue: true    # Render generates a secure random 32+ char value
       - key: FRONTEND_URL
-        sync: false            # you will paste your Vercel URL after deploying
+        sync: false            # paste your Vercel URL after deploying
       - key: CORS_ORIGINS
-        sync: false            # paste your Vercel URL here too (can be same as FRONTEND_URL)
+        sync: false            # comma-separated extra origins if needed
       - key: DEBUG
         value: "false"
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
@@ -25,8 +26,16 @@ services:
         value: "15"
       - key: CONFIDENCE_THRESHOLD
         value: "0.40"
-    disk:
-      name: uploads
-      mountPath: /app/uploads
-      sizeGB: 1
-
+      # S3-compatible persistent storage (e.g. Cloudflare R2 - 10GB free, 0 egress)
+      - key: STORAGE_BACKEND
+        value: "local"         # change to "s3" when using Cloudflare R2 / Supabase S3
+      - key: S3_ENDPOINT_URL
+        sync: false            # e.g. https://<account_id>.r2.cloudflarestorage.com
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: S3_BUCKET_NAME
+        value: "smart-doc-vault"
+      - key: S3_REGION
+        value: "auto"

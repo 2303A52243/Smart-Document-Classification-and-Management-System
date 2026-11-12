@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check } from 'lucide-react';
+import { X } from 'lucide-react';
 
 const CATEGORIES = [
   { id: 'resume', label: 'Resume', desc: 'CVs, candidate portfolios, job applications' },

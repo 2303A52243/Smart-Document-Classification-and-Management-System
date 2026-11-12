@@ -10,6 +10,11 @@ def test_health_check(client):
     assert data["model_loaded"] is True
     assert "1.0.0" in data["model_version"]
 
+    # Also test /api/health for frontend client compatibility
+    api_response = client.get("/api/health")
+    assert api_response.status_code == 200
+    assert api_response.json()["status"] == "ok"
+
 def test_get_metrics(client):
     response = client.get("/api/analytics/metrics")
     assert response.status_code == 200

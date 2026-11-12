@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
-  FileText,
   Download,
   Trash2,
   Edit3,
@@ -11,10 +10,6 @@ import {
   Check,
   Eye,
   AlertCircle,
-  Sparkles,
-  Layers,
-  Clock,
-  ShieldCheck,
   ExternalLink,
 } from 'lucide-react';
 import { documentAPI } from '../api/client';
@@ -37,7 +32,7 @@ export default function DocumentDetail() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const fetchDoc = async () => {
+  const fetchDoc = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -49,11 +44,11 @@ export default function DocumentDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchDoc();
-  }, [id]);
+  }, [fetchDoc]);
 
   const handleCopyText = () => {
     if (doc?.extracted_text) {

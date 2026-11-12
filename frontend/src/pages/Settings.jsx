@@ -4,13 +4,9 @@ import {
   User,
   Lock,
   Server,
-  ShieldCheck,
   Check,
   AlertCircle,
   LogOut,
-  Sparkles,
-  Database,
-  Cpu,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../api/client';

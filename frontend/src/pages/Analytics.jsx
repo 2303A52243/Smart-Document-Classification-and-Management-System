@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   BarChart3,
-  PieChart as PieIcon,
-  TrendingUp,
   Brain,
   AlertTriangle,
-  CheckCircle2,
-  Cpu,
-  Layers,
-  Sparkles,
+  AlertCircle,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -18,15 +13,12 @@ import {
   YAxis,
   Tooltip,
   Cell,
-  PieChart,
-  Pie,
 } from 'recharts';
 import { analyticsAPI } from '../api/client';
 
 const COLORS = ['#10b981', '#3b82f6', '#a855f7', '#f59e0b', '#f43f5e', '#6366f1', '#94a3b8'];
 
 export default function Analytics() {
-  const [overview, setOverview] = useState(null);
   const [categories, setCategories] = useState([]);
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -35,12 +27,10 @@ export default function Analytics() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [ovRes, catRes, metRes] = await Promise.all([
-          analyticsAPI.getOverview(),
-          analyticsAPI.getCategories(),
-          analyticsAPI.getMetrics(),
-        ]);
-        setOverview(ovRes.data);
+        const [catRes, metRes] = await Promise.all([
+            analyticsAPI.getCategories(),
+            analyticsAPI.getMetrics(),
+          ]);
         setCategories(catRes.data);
         setMetrics(metRes.data);
       } catch (err) {
@@ -79,6 +69,13 @@ export default function Analytics() {
           Real database ingestion volume and empirical scikit-learn test evaluation metrics.
         </p>
       </div>
+
+      {error && (
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
 
       {/* Synthetic Dataset Academic Disclaimer */}
       {metrics?.disclaimer && (
@@ -191,24 +188,24 @@ export default function Analytics() {
 
           <div className="space-y-3 pt-2">
             {metrics?.dataset_distribution &&
-              Object.entries(metrics.dataset_distribution).map(([cat, count], idx) => (
-                <div key={cat} className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="font-medium text-slate-700 capitalize">
-                      {cat.replace('_', ' ')}
-                    </span>
-                    <span className="font-mono text-slate-500">{count} samples</span>
+                Object.entries(metrics.dataset_distribution).map(([cat, count]) => (
+                  <div key={cat} className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="font-medium text-slate-700 capitalize">
+                        {cat.replace('_', ' ')}
+                      </span>
+                      <span className="font-mono text-slate-500">{count} samples</span>
+                    </div>
+                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-indigo-600"
+                        style={{
+                          width: `${Math.round((count / (metrics.total_samples || 1)) * 100)}%`,
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-indigo-600"
-                      style={{
-                        width: `${Math.round((count / (metrics.total_samples || 1)) * 100)}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
+                ))}
           </div>
         </div>
       </div>
@@ -293,15 +290,14 @@ export default function Analytics() {
                     {row.map((val, cIdx) => (
                       <td
                         key={cIdx}
-                        className={`w-12 h-10 p-2 font-mono text-xs border border-white font-semibold ${
-                          rIdx === cIdx
+                        className={`w-12 h-10 p-2 font-mono text-xs border border-white font-semibold ${rIdx === cIdx
                             ? val > 0
                               ? 'bg-emerald-500 text-white'
                               : 'bg-slate-100 text-slate-400'
                             : val > 0
-                            ? 'bg-rose-500 text-white'
-                            : 'bg-slate-50 text-slate-300'
-                        }`}
+                              ? 'bg-rose-500 text-white'
+                              : 'bg-slate-50 text-slate-300'
+                          }`}
                       >
                         {val}
                       </td>

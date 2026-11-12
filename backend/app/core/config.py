@@ -34,12 +34,20 @@ class Settings:
     MONGODB_URL: str = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
     MONGODB_DB_NAME: str = os.getenv("MONGODB_DB_NAME", "smart_doc_db")
 
-    # File Upload
+    # File Upload & Object Storage
     UPLOAD_DIR: Path = UPLOADS_DIR
     MODEL_DIR: Path = MODELS_DIR
     MAX_FILE_SIZE_MB: int = int(os.getenv("MAX_FILE_SIZE_MB", "15"))
     MAX_FILE_SIZE_BYTES: int = MAX_FILE_SIZE_MB * 1024 * 1024
     ALLOWED_EXTENSIONS: set = {"pdf", "docx", "txt"}
+
+    # Storage Backend ("local" or "s3" for Cloudflare R2 / Supabase / AWS S3)
+    STORAGE_BACKEND: str = os.getenv("STORAGE_BACKEND", "local").lower()
+    S3_ENDPOINT_URL: str = os.getenv("S3_ENDPOINT_URL", "")
+    S3_ACCESS_KEY_ID: str = os.getenv("S3_ACCESS_KEY_ID", "")
+    S3_SECRET_ACCESS_KEY: str = os.getenv("S3_SECRET_ACCESS_KEY", "")
+    S3_BUCKET_NAME: str = os.getenv("S3_BUCKET_NAME", "smart-doc-vault")
+    S3_REGION: str = os.getenv("S3_REGION", "auto")
 
     # CORS — includes Vercel and local dev origins
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")

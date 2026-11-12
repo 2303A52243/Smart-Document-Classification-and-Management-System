@@ -52,6 +52,7 @@ cloudflared.exe
 .vercel-backup/
 
 # Document Uploads & Databases (NEVER COMMIT USER DOCUMENTS)
+.mongodb_data/
 backend/uploads/*
 !backend/uploads/.gitkeep
 backend/data/*

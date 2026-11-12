@@ -27,6 +27,8 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Startup and shutdown lifecycle."""
     logger.info(f"🚀 Starting {settings.APP_NAME} v{settings.VERSION}")
+    if not settings.DEBUG and settings.JWT_SECRET_KEY == "change-this-secret-in-production-min-32-chars-long":
+        logger.warning("⚠️ SECURITY WARNING: Using default JWT_SECRET_KEY in production! Please set JWT_SECRET_KEY in environment variables.")
     await connect_db()
     yield
     await disconnect_db()
@@ -63,6 +65,7 @@ app.include_router(auth_router, prefix=API_PREFIX)
 app.include_router(documents_router, prefix=API_PREFIX)
 app.include_router(analytics_router, prefix=API_PREFIX)
 app.include_router(categories_router, prefix=API_PREFIX)
+app.include_router(health_router, prefix=API_PREFIX)
 app.include_router(health_router)
 
 @app.get("/")

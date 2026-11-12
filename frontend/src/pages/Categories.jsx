@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  FolderTree,
   FileText,
   ArrowRight,
-  Sparkles,
   AlertCircle,
   ExternalLink,
 } from 'lucide-react';

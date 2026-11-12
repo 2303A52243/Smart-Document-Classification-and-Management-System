@@ -8,8 +8,7 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Sparkles,
-  FileText
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 

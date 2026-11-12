@@ -62,12 +62,17 @@ async def get_category_documents(
 
 
 @health_router.get("/health")
-async def health_check():
-    """API health check endpoint."""
+def health_check():
+    """API health and readiness check endpoint."""
+    from app.database.connection import db_instance
+    db_connected = db_instance.client is not None and db_instance.db is not None
+    is_ready = classifier.is_loaded()
     return {
-        "status": "ok",
+        "status": "ok" if is_ready else "error",
+        "database_connected": db_connected,
         "model_loaded": classifier.is_loaded(),
         "model_version": classifier.model_version,
+        "storage_backend": settings.STORAGE_BACKEND,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 

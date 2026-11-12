@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authAPI } from '../api/client';
 
 const AuthContext = createContext(null);
@@ -10,6 +10,13 @@ export const AuthProvider = ({ children }) => {
   });
   const [token, setToken] = useState(() => localStorage.getItem('smart_doc_token') || null);
   const [loading, setLoading] = useState(true);
+
+  const logout = useCallback(() => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem('smart_doc_token');
+    localStorage.removeItem('smart_doc_user');
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -27,10 +34,16 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     };
     checkAuth();
-  }, []);
+  }, [logout]);
 
   const login = async (email, password) => {
     const res = await authAPI.login({ email, password });
+    if (!res.data || typeof res.data !== 'object' || !res.data.access_token) {
+      if (typeof res.data === 'string' && res.data.includes('<!DOCTYPE')) {
+        throw new Error('Frontend is not communicating with backend API. VITE_API_BASE_URL is missing or misconfigured in Vercel.');
+      }
+      throw new Error('Invalid response received from server.');
+    }
     const { access_token, user: userData } = res.data;
     setToken(access_token);
     setUser(userData);
@@ -41,19 +54,18 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     const res = await authAPI.register({ name, email, password });
+    if (!res.data || typeof res.data !== 'object' || !res.data.access_token) {
+      if (typeof res.data === 'string' && res.data.includes('<!DOCTYPE')) {
+        throw new Error('Frontend is not communicating with backend API. VITE_API_BASE_URL is missing or misconfigured in Vercel.');
+      }
+      throw new Error('Invalid response received from server.');
+    }
     const { access_token, user: userData } = res.data;
     setToken(access_token);
     setUser(userData);
     localStorage.setItem('smart_doc_token', access_token);
     localStorage.setItem('smart_doc_user', JSON.stringify(userData));
     return userData;
-  };
-
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('smart_doc_token');
-    localStorage.removeItem('smart_doc_user');
   };
 
   const updateUser = (userData) => {
@@ -86,4 +98,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
