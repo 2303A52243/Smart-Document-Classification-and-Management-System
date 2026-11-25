@@ -1,21 +1,35 @@
 """
 Authentication dependency — extracts and validates the JWT bearer token
-from the Authorization header and returns the current user dict.
+from the Authorization header or token query parameter and returns the current user dict.
 """
-from fastapi import Depends, HTTPException, status
+from typing import Optional
+from fastapi import Depends, HTTPException, Query, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app.core.security import decode_access_token
 from app.database.connection import get_users_collection
 
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    token_query: Optional[str] = Query(None, alias="token"),
 ) -> dict:
     """Validate JWT and return the user document from MongoDB."""
-    token = credentials.credentials
+    token = None
+    if credentials and credentials.credentials:
+        token = credentials.credentials
+    elif token_query:
+        token = token_query.strip()
+
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated. Provide Authorization header or token query parameter.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     payload = decode_access_token(token)
 
     if not payload or "sub" not in payload:

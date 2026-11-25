@@ -77,8 +77,14 @@ export const documentAPI = {
   list: (params) => api.get('/documents', { params }),
   search: (q) => api.get('/documents/search', { params: { q } }),
   getById: (id) => api.get(`/documents/${id}`),
-  downloadUrl: (id) => `${API_BASE}/documents/${id}/download`,
-  previewUrl: (id) => `${API_BASE}/documents/${id}/preview`,
+  downloadUrl: (id) => {
+    const token = localStorage.getItem('smart_doc_token') || '';
+    return `${API_BASE}/documents/${id}/download${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+  },
+  previewUrl: (id) => {
+    const token = localStorage.getItem('smart_doc_token') || '';
+    return `${API_BASE}/documents/${id}/preview${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+  },
   delete: (id) => api.delete(`/documents/${id}`),
   updateCategory: (id, category, notes) =>
     api.patch(`/documents/${id}/category`, { category, notes }),

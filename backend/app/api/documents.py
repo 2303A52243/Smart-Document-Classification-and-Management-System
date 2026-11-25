@@ -1,13 +1,14 @@
 """
 Document routes — upload, list, search, detail, download, preview, delete, reclassify, update category.
 """
+import os
 import logging
 import math
 from datetime import datetime, timezone
 from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, status
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from bson import ObjectId
 
 from app.core.dependencies import get_current_user
@@ -246,14 +247,32 @@ async def download_document(doc_id: str, current_user: dict = Depends(get_curren
 
     try:
         file_path = get_file_path(doc["stored_filename"])
-    except (FileNotFoundError, StorageError) as e:
-        raise HTTPException(404, f"File not found on disk: {str(e)}")
-
-    return FileResponse(
-        path=str(file_path),
-        filename=doc["original_filename"],
-        media_type="application/octet-stream",
-    )
+        return FileResponse(
+            path=str(file_path),
+            filename=doc["original_filename"],
+            media_type="application/octet-stream",
+        )
+    except (FileNotFoundError, StorageError):
+        # Render ephemeral disk fallback: serve extracted text from MongoDB
+        extracted_text = doc.get("extracted_text") or doc.get("text_preview") or ""
+        if extracted_text:
+            content_bytes = extracted_text.encode("utf-8")
+            try:
+                upload_dir = settings.UPLOAD_DIR
+                os.makedirs(upload_dir, exist_ok=True)
+                full_path = os.path.join(upload_dir, doc["stored_filename"])
+                with open(full_path, "wb") as f:
+                    f.write(content_bytes)
+            except Exception:
+                pass
+            return Response(
+                content=content_bytes,
+                media_type="text/plain; charset=utf-8",
+                headers={
+                    "Content-Disposition": f"attachment; filename=\"{doc['original_filename']}\""
+                },
+            )
+        raise HTTPException(404, "File not found on storage and no cached content available.")
 
 
 @router.get("/{doc_id}/preview")
@@ -271,24 +290,40 @@ async def preview_document(doc_id: str, current_user: dict = Depends(get_current
     if not doc:
         raise HTTPException(404, "Document not found.")
 
-    try:
-        file_path = get_file_path(doc["stored_filename"])
-    except (FileNotFoundError, StorageError) as e:
-        raise HTTPException(404, f"File not found: {str(e)}")
-
     content_type_map = {
         "pdf": "application/pdf",
-        "txt": "text/plain",
-        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        "txt": "text/plain; charset=utf-8",
+        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     }
-    ft = doc.get("file_type", "bin")
-    media_type = content_type_map.get(ft, "application/octet-stream")
+    ft = doc.get("file_type", "txt")
+    media_type = content_type_map.get(ft, "text/plain; charset=utf-8")
 
-    return FileResponse(
-        path=str(file_path),
-        media_type=media_type,
-        headers={"Content-Disposition": f"inline; filename=\"{doc['original_filename']}\""}
-    )
+    try:
+        file_path = get_file_path(doc["stored_filename"])
+        return FileResponse(
+            path=str(file_path),
+            media_type=media_type,
+            headers={"Content-Disposition": f"inline; filename=\"{doc['original_filename']}\""},
+        )
+    except (FileNotFoundError, StorageError):
+        # Render ephemeral disk fallback: serve extracted text from MongoDB inline
+        extracted_text = doc.get("extracted_text") or doc.get("text_preview") or ""
+        if extracted_text:
+            content_bytes = extracted_text.encode("utf-8")
+            try:
+                upload_dir = settings.UPLOAD_DIR
+                os.makedirs(upload_dir, exist_ok=True)
+                full_path = os.path.join(upload_dir, doc["stored_filename"])
+                with open(full_path, "wb") as f:
+                    f.write(content_bytes)
+            except Exception:
+                pass
+            return Response(
+                content=content_bytes,
+                media_type="text/plain; charset=utf-8",
+                headers={"Content-Disposition": f"inline; filename=\"{doc['original_filename']}\""},
+            )
+        raise HTTPException(404, "File not found on storage and no text preview available.")
 
 
 @router.delete("/{doc_id}", status_code=status.HTTP_204_NO_CONTENT)
